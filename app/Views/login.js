@@ -1,31 +1,36 @@
 import { useState } from "react";
 import { ScrollView, Text, StyleSheet, FlatList, View } from "react-native";
 import Form from "../Components/RegLoginForm.jsx";
+import AnimatedBackground from "../Components/AnimatedBackground.jsx";
 
 const Login = () => {
-const [isRegistration, setIsRegistration] = useState(false);
+  const [isRegistration, setIsRegistration] = useState(false);
 
   const styles = StyleSheet.create({
-
     container: {
       flex: 1,
       justifyContent: "center",
       alignItems: "center",
-      backgroundColor: "#b21414",
+      backgroundColor: "transparent",
     },
     text: {
       color: "#fff",
-      backgroundColor: "#181717",
+      backgroundColor: "transparent",
     },
   });
 
   return (
-    <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-      <View style={styles.container}>
-        <Text style={styles.text}>Login Screen</Text>
-        <Form registration={isRegistration} isLogin={() => setIsRegistration(!isRegistration)} />
-      </View>
-    </ScrollView>
+    <View style={{ flex: 1 }}>
+      <AnimatedBackground />
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+        <View style={styles.container}>
+          <Form
+            registration={isRegistration}
+            isLogin={() => setIsRegistration(!isRegistration)}
+          />
+        </View>
+      </ScrollView>
+    </View>
   );
 };
 
