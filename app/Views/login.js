@@ -1,7 +1,10 @@
-import { Background } from "@react-navigation/elements";
+import { useState } from "react";
 import { ScrollView, Text, StyleSheet, FlatList, View } from "react-native";
+import Form from "../Components/RegLoginForm.jsx";
 
 const Login = () => {
+const [isRegistration, setIsRegistration] = useState(false);
+
   const styles = StyleSheet.create({
 
     container: {
@@ -20,6 +23,7 @@ const Login = () => {
     <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
       <View style={styles.container}>
         <Text style={styles.text}>Login Screen</Text>
+        <Form registration={isRegistration} isLogin={() => setIsRegistration(!isRegistration)} />
       </View>
     </ScrollView>
   );

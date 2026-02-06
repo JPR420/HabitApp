@@ -1,9 +1,10 @@
 import { View, Text, StyleSheet } from "react-native";
 import { useEffect } from "react";
-import { router } from "expo-router"; 
+import { router } from "expo-router";
+import status from "../../services/status";
+
 
 const SplashScreen = () => {
-
   const styles = StyleSheet.create({
     container: {
       display: "flex",
@@ -20,13 +21,35 @@ const SplashScreen = () => {
     },
   });
 
-    useEffect(() => {
-    const timer = setTimeout(() => {
-      router.replace("/Views/login"); 
-    }, 2000);
+  const checkStatus = async () => {
+    try {
+      const response = await status();
+      if (response && response.msg === "okay") {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (error) {
+      return false;
+    }
+  };
 
-        return () => clearTimeout(timer); 
-  }, []);
+
+useEffect(() => {
+  const run = async () => {
+    const ok = await checkStatus();
+
+    await new Promise(r => setTimeout(r, 2000));
+    if (ok) {
+      router.replace("/Views/login");
+    } else {
+      router.replace("/Views/error");
+    }
+  };
+
+  run();
+}, []);
+
 
   return (
     <View style={styles.container}>
