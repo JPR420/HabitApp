@@ -22,7 +22,7 @@ The app is designed to support any type of habit (e.g. reading, gym, meditation,
 
 - **React Native**
 - **Expo**
-- **JavaScript / TypeScript**
+- **JavaScript**
 - **React Navigation**
 - **Axios**
 - **JWT-based authentication**
@@ -65,4 +65,3 @@ The app communicates with a Spring Boot REST API.
 - JWT tokens are attached via Authorization headers
 - Error handling is standardized for user feedback
 
-Example:
