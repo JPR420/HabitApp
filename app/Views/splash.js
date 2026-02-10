@@ -3,7 +3,6 @@ import { useEffect } from "react";
 import { router } from "expo-router";
 import status from "../../services/status";
 
-
 const SplashScreen = () => {
   const styles = StyleSheet.create({
     container: {
@@ -21,35 +20,27 @@ const SplashScreen = () => {
     },
   });
 
-  const checkStatus = async () => {
-    try {
-      const response = await status();
-      if (response && response.msg === "okay") {
-        return true;
-      } else {
-        return false;
+  useEffect(() => {
+    const run = async () => {
+      try {
+        const response = await status();
+        const ok = response?.status === "ok";
+
+        await new Promise((r) => setTimeout(r, 2000));
+
+        if (ok) {
+          router.replace("/Views/login");
+        } else {
+          router.replace("/Views/error");
+        }
+      } catch (error) {
+         // handle error by redirecting to error screen
+        router.replace("/Views/error");
       }
-    } catch (error) {
-      return false;
-    }
-  };
+    };
 
-
-useEffect(() => {
-  const run = async () => {
-    const ok = await checkStatus();
-
-    await new Promise(r => setTimeout(r, 2000));
-    if (ok) {
-      router.replace("/Views/login");
-    } else {
-      router.replace("/Views/error");
-    }
-  };
-
-  run();
-}, []);
-
+    run();
+  }, []);
 
   return (
     <View style={styles.container}>

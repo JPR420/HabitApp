@@ -1,11 +1,70 @@
 import { View, TextInput, Text, StyleSheet, Pressable } from "react-native";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Button from "./Button.jsx";
 
 const RegLoginForm = ({ registration = false, submit, isLogin }) => {
-  const [nameInputValue, setnameInputValue] = useState("");
+  const [nameInputValue, setNameInputValue] = useState("");
   const [emailInputValue, setEmailInputValue] = useState("");
   const [passwordInputValue, setPasswordInputValue] = useState("");
+  const [disableButton, setDisableButton] = useState(true);
+
+  const [nameError, setNameError] = useState("");
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+
+  // Regex patterns
+  const nameRegex = /^[a-zA-Z\s]*$/; // letters & spaces only
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const passwordRegex =
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{8,}$/;
+
+  // Live validation
+  useEffect(() => {
+    if (registration) {
+      if (!nameInputValue) setNameError("");
+      else if (!nameRegex.test(nameInputValue))
+        setNameError("Name can only contain letters and spaces");
+      else setNameError("");
+    }
+  }, [nameInputValue, registration]);
+
+  useEffect(() => {
+    if (!emailInputValue) setEmailError("");
+    else if (!emailRegex.test(emailInputValue))
+      setEmailError("Invalid email format");
+    else setEmailError("");
+  }, [emailInputValue]);
+
+  useEffect(() => {
+    if (!passwordInputValue) setPasswordError("");
+    else if (!passwordRegex.test(passwordInputValue))
+      setPasswordError(
+        "Password must have uppercase, lowercase, number, special char, min 8",
+      );
+    else setPasswordError("");
+  }, [passwordInputValue]);
+
+  // Handle submit
+  const handleSubmit = () => {
+    if (registration) {
+      if (nameError || emailError || passwordError) return;
+      submit(nameInputValue, emailInputValue, passwordInputValue);
+    } else {
+      if (emailError || passwordError) return;
+      submit(emailInputValue, passwordInputValue);
+    }
+  };
+
+    // Enable/disable button based on empty fields
+  useEffect(() => {
+    if (registration) {
+      setDisableButton(
+        !nameInputValue || !emailInputValue || !passwordInputValue
+      );
+    } else {
+      setDisableButton(!emailInputValue || !passwordInputValue);
+    }
+  }, [nameInputValue, emailInputValue, passwordInputValue, registration]);
 
   const styles = StyleSheet.create({
     formContainer: {
@@ -57,35 +116,60 @@ const RegLoginForm = ({ registration = false, submit, isLogin }) => {
       width: 70,
     },
 
-    navigatorText:{
-        display: "flex",
-        width: "100%",
-        height: "fit-content",
-        justifyContent: "flex-end",
-        alignItems: "flex-start",
-        transform: [{ translateY: 10 }],
+    navigatorText: {
+      display: "flex",
+      width: "100%",
+      height: "fit-content",
+      justifyContent: "flex-end",
+      alignItems: "flex-start",
+      transform: [{ translateY: 10 }],
+    },
+    errorTextContainer: {
+      display: "flex",
+      flexDirection: "row",
+      width: "100%",
+      height: "fit-content",
+      justifyContent: "center",
+      alignItems: "flex-start",
+    
+    },
+
+    errorText: {
+      width: "100%",
+      color: "#ff4d4d",
+      fontSize: 12,
+      textAlign: "center",
+      marginBottom: 2,
     },
 
     navigatorTextContent: {
-        fontSize: 13,
-        color: "#3075ba",
-        fontWeight: "bold",
+      fontSize: 13,
+      color: "#3075ba",
+      fontWeight: "bold",
     },
   });
 
   return (
-    <View style={styles.formContainer}>
+    <View style={registration ? [styles.formContainer, { height: "43%" }] : styles.formContainer}>
       <View style={styles.fieldWrapper}>
         {registration && (
-          <View style={styles.inputContainer}>
-            <Text style={styles.text}>Name:</Text>
-            <TextInput
-              style={styles.input}
-              onChangeText={setnameInputValue}
-              value={nameInputValue}
-              placeholder="Name"
-            />
-          </View>
+          <>
+            <View style={styles.inputContainer}>
+              <Text style={styles.text}>Name:</Text>
+              <TextInput
+                style={styles.input}
+                onChangeText={setNameInputValue}
+                value={nameInputValue}
+                placeholder="Name"
+              />
+            </View>
+
+            {nameError ? (
+              <View style={styles.errorTextContainer}>
+                <Text style={styles.errorText}>{nameError}</Text>
+              </View>
+            ) : null}
+          </>
         )}
         <View style={styles.inputContainer}>
           <Text style={styles.text}>Email:</Text>
@@ -96,6 +180,7 @@ const RegLoginForm = ({ registration = false, submit, isLogin }) => {
             placeholder="Email"
           />
         </View>
+        {emailError ? <Text style={styles.errorText}>{emailError}</Text> : null}
         <View style={styles.inputContainer}>
           <Text style={styles.text}>Password:</Text>
           <TextInput
@@ -105,24 +190,22 @@ const RegLoginForm = ({ registration = false, submit, isLogin }) => {
             placeholder="Password"
           />
         </View>
-        {registration && (
-          <Button
-            buttonText="Register"
-            onClick={() =>
-              submit(nameInputValue, emailInputValue, passwordInputValue)
-            }
-          />
-        )}
-
-        {!registration && (
-          <Button
-            buttonText="Login"
-            onClick={() => submit(emailInputValue, passwordInputValue)}
-          />
-        )}
+        {passwordError ? (
+          <Text style={styles.errorText}>{passwordError}</Text>
+        ) : null}
+        <Button
+          disable={disableButton}
+          buttonText={registration ? "Register" : "Login"}
+          onClick={handleSubmit}
+        />
         <View style={styles.navigatorText}>
           <Pressable onPress={() => isLogin()}>
-            <Text style={styles.navigatorTextContent}> {registration ? "Have an account? Login" : "Don't have an account? Register"}</Text>
+            <Text style={styles.navigatorTextContent}>
+              {" "}
+              {registration
+                ? "Have an account? Login"
+                : "Don't have an account? Register"}
+            </Text>
           </Pressable>
         </View>
       </View>
