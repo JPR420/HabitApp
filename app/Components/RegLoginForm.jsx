@@ -1,12 +1,20 @@
-import { View, TextInput, Text, StyleSheet, Pressable } from "react-native";
+import {
+  View,
+  TextInput,
+  Text,
+  StyleSheet,
+  Pressable,
+  TouchableOpacity,
+} from "react-native";
 import React, { useState, useEffect } from "react";
 import Button from "./Button.jsx";
 
-const RegLoginForm = ({ registration = false, submit, isLogin }) => {
+const RegLoginForm = ({ registration = false, submit, isLogin, APIresponse = null }) => {
   const [nameInputValue, setNameInputValue] = useState("");
   const [emailInputValue, setEmailInputValue] = useState("");
   const [passwordInputValue, setPasswordInputValue] = useState("");
   const [disableButton, setDisableButton] = useState(true);
+  const [showPassword, setShowPassword] = useState(false);
 
   const [nameError, setNameError] = useState("");
   const [emailError, setEmailError] = useState("");
@@ -55,11 +63,11 @@ const RegLoginForm = ({ registration = false, submit, isLogin }) => {
     }
   };
 
-    // Enable/disable button based on empty fields
+  // Enable/disable button based on empty fields
   useEffect(() => {
     if (registration) {
       setDisableButton(
-        !nameInputValue || !emailInputValue || !passwordInputValue
+        !nameInputValue || !emailInputValue || !passwordInputValue,
       );
     } else {
       setDisableButton(!emailInputValue || !passwordInputValue);
@@ -131,7 +139,6 @@ const RegLoginForm = ({ registration = false, submit, isLogin }) => {
       height: "fit-content",
       justifyContent: "center",
       alignItems: "flex-start",
-    
     },
 
     errorText: {
@@ -147,10 +154,21 @@ const RegLoginForm = ({ registration = false, submit, isLogin }) => {
       color: "#3075ba",
       fontWeight: "bold",
     },
+
+    button: {
+      position: "absolute",
+      right: 10,
+    },
   });
 
   return (
-    <View style={registration ? [styles.formContainer, { height: "43%" }] : styles.formContainer}>
+    <View
+      style={
+        registration
+          ? [styles.formContainer, { height: "43%" }]
+          : styles.formContainer
+      }
+    >
       <View style={styles.fieldWrapper}>
         {registration && (
           <>
@@ -188,7 +206,17 @@ const RegLoginForm = ({ registration = false, submit, isLogin }) => {
             onChangeText={setPasswordInputValue}
             value={passwordInputValue}
             placeholder="Password"
+            textContentType="password"
+            autoComplete="current-password"
+            secureTextEntry={!showPassword}
           />
+
+          <TouchableOpacity
+            onPress={() => setShowPassword(!showPassword)}
+            style={styles.button}
+          >
+            <Text>{showPassword ? "Hide" : "Show"}</Text>
+          </TouchableOpacity>
         </View>
         {passwordError ? (
           <Text style={styles.errorText}>{passwordError}</Text>
@@ -198,6 +226,7 @@ const RegLoginForm = ({ registration = false, submit, isLogin }) => {
           buttonText={registration ? "Register" : "Login"}
           onClick={handleSubmit}
         />
+        {APIresponse && <Text style={{ margin: 6, color: "#ef2b2b", fontSize: 13, width: "100%", textAlign: "center" }}>{APIresponse}</Text>}
         <View style={styles.navigatorText}>
           <Pressable onPress={() => isLogin()}>
             <Text style={styles.navigatorTextContent}>
